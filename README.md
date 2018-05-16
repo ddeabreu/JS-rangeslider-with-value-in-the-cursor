@@ -24,6 +24,5 @@ Check out the [examples](http://rangeslider.js.org/).
 - Ask a question such as "How do I …?". Open a [StackOverflow](https://stackoverflow.com/search?q=rangeslider.js) question with rangeslider.js tag or ask in the [Gitter chat room](https://gitter.im/andreruffert/rangeslider.js).
 
 ## License
-MIT © [André Ruffert](http://andreruffert.com)
+MIT © 
 
-[![rangeslider.js](https://img.shields.io/badge/rangeslider-.js-00ff00.svg)](http://rangeslider.js.org) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/andreruffert/rangeslider.js) [![JS.ORG](https://img.shields.io/badge/js.org-rangeslider-ffb400.svg?style=flat-square)](http://js.org)
