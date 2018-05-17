@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>rangeslider.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../dist/rangeslider.css">
+    <style>
+        *,
+        *:before,
+        *:after {
+            -webkit-box-sizing: border-box;
+               -moz-box-sizing: border-box;
+                    box-sizing: border-box;
+        }
+
+        html {
+            color: #404040;
+            font-family: Helvetica, arial, sans-serif;
+        }
+        body {
+            padding: 50px 20px;
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        output {
+            display: block;
+            font-size: 30px;
+            font-weight: bold;
+            text-align: center;
+            margin: 30px 0;
+            width: 100%;
+            text-align: right
+        }
+
+        .u-left {
+            float: left;
+        }
+
+        .u-cf:before,
+        .u-cf:after {
+            content: "";
+            display: table;
+        }
+        .u-cf:after {
+            clear: both;
+        }
+
+        .u-text-left {
+            text-align: left;
+        }
+        /*********************** ADD DDA ********************/
+        .rangeslider--horizontal .rangeslider__handle {
+		    top: -17px;
+	    }
+        .rangeslider__handle {
+		    width: 100px;
+		    border-radius: 12px;
+		    background: #38a7f8;
+		    color: white;
+		    border: 1px solid #219df7;
+		}
+        .rangeslider--horizontal {
+		    height: 5px;
+		    width: 100%;
+		    background: black;
+		}
+        .rangeslider__fill {
+	    background: black;
+	    }
+        .rangeslider__handle:after {
+	    	right: 5px;
+	    	background-image: none !important;
+	    }
+	    
+        div.change:after {
+		    content: attr(data-content);
+		}
+		div.change.nb_supp_a_dix:after {
+		    right: 15px;
+		}
+    </style>
+    <!--[if lt IE 9]>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+	
+
+    <div>
+        <h2>Floating point boundaries</h2>
+        <div>
+            <input type="range" min="1" max="11" step="0.5" value="10.2" data-rangeslider>
+            <output>10h et +</output>
+        </div>
+    </div>
+
+    <br>
+    <br>
+    
+    
+      
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="../dist/rangeslider.js"></script>
+    <script>
+    $(function() {
+
+        var $document = $(document);
+        var selector = '[data-rangeslider]';
+        var $element = $(selector);
+
+        // For ie8 support
+        var textContent = ('textContent' in document) ? 'textContent' : 'innerText';
+
+        // Example functionality to demonstrate a value feedback
+        function valueOutput(element) {
+            var value = element.value;
+            
+            //je commente ici pour ne pas rafraichir la div output, je l utilise pour faire autre chose
+            /*var output = element.parentNode.getElementsByTagName('output')[0] || element.parentNode.parentNode.getElementsByTagName('output')[0];
+            output[textContent] = value;*/
+            
+            //ADD DDA ajout de la value dans le curseur
+            //Comme value est un string je dois test si on est dans le cas d un chiffre rond ou a virgule pour ne pas flinguer le css
+            //console.log('value vaut'+ value+' et est de type: '+typeof value);
+            
+            //si j ai un nb rond je rajoute un .0 à la fin pour uniformiser la casse
+            if(value.indexOf('.') == -1){
+	            //si je n'ai pas de . alors je rajoute un .0
+	            value = value+'.0';	            
+            }
+            
+            //je fais un test pour le cas suppérieur a 10 qui flingue aussi le css
+            if(parseFloat(value) >= 10){
+	            console.log('valeur supp a 10 donc je décalle mon nb en ajoutant la classe nb_supp_a_dix');
+	            jQuery('.rangeslider__handle').addClass('nb_supp_a_dix');
+            }else{
+	            console.log('valeur inf a 10 donc je retire la classe nb_supp_a_dix');
+	            jQuery('.rangeslider__handle').removeClass('nb_supp_a_dix');
+            }
+            
+            
+            
+            jQuery('.rangeslider__handle').addClass('change').attr('data-content',value);
+            
+        }
+
+        $document.on('input', 'input[type="range"], ' + selector, function(e) {
+            valueOutput(e.target);
+        });
+
+        // Example functionality to demonstrate disabled functionality
+        $document .on('click', '#js-example-disabled button[data-behaviour="toggle"]', function(e) {
+            var $inputRange = $(selector, e.target.parentNode);
+
+            if ($inputRange[0].disabled) {
+                $inputRange.prop("disabled", false);
+            }
+            else {
+                $inputRange.prop("disabled", true);
+            }
+            $inputRange.rangeslider('update');
+        });
+
+        
+        // Basic rangeslider initialization
+        $element.rangeslider({
+
+            // Deactivate the feature detection
+            polyfill: false,
+
+            // Callback function
+            onInit: function() {
+                valueOutput(this.$element[0]);
+            },
+
+            // Callback function
+            onSlide: function(position, value) {
+                console.log('onSlide');
+                console.log('position: ' + position, 'value: ' + value);
+            },
+
+            // Callback function
+            onSlideEnd: function(position, value) {
+                console.log('onSlideEnd');
+                console.log('position: ' + position, 'value: ' + value);
+            }
+        });
+
+    });
+    
+/****** TAF MOBILE */    
+document.addEventListener('touchstart', handleTouchStart, false);        
+document.addEventListener('touchmove', handleTouchMove, false);
+
+//var globale
+var xDown = null;                                                        
+var yDown = null;                                                        
+
+function handleTouchStart(evt) {                                         
+    xDown = evt.touches[0].clientX;                                      
+    yDown = evt.touches[0].clientY;                                      
+};                                                
+
+function handleTouchMove(evt) {
+    if ( ! xDown || ! yDown ) {
+        return;
+    }
+
+    var xUp = evt.touches[0].clientX;                                    
+    var yUp = evt.touches[0].clientY;
+
+    var xDiff = xDown - xUp;
+    var yDiff = yDown - yUp;
+
+    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {
+        if ( xDiff > 0 ) {
+            /* left swipe */ 
+            console.log('swipe left');
+        } else {
+            /* right swipe */
+            console.log('swipe right');
+        }                       
+    } else {
+        if ( yDiff > 0 ) {
+            /* up swipe */ 
+        } else { 
+            /* down swipe */
+        }                                                                 
+    }
+    /* reset values */
+    xDown = null;
+    yDown = null;                                             
+};
+    </script>
+</body>
+</html>
